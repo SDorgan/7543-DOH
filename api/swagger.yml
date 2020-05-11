@@ -1,121 +1,177 @@
 openapi: 3.0.0
 info:
   version: "1.0.0"
-  title: API de Alumnos
-  description: Documentación de la API de Alumnos de la materia 75.43 Introducción a Sistemas Distribuidos
+  title: API to resolve domain names
+  description: Documentation of the API
 
 servers:
   - url: http://localhost:8080/api
-    description: Servidor de desarrollo
+    description: Development server
 
 # Paths servidos por la aplicación
 paths:
-  /alumnos:
+  /domains/{domain}:
     get:
-      operationId: "api.alumnos.obtener_todos"
-      tags:
-        - "Alumnos"
-      summary: "Colección de alumnos de la materia"
-      description: "Obtiene la lista de todos los alumnos de la materia existentes en el sistema"
+      operationId: "api.doh.get_domain"
+      summary: "Resolve a domain name"
+      description: "Obtain the resolution of the ip from a domain name"
+      parameters: 
+        - in: path
+          name: domain
+          schema:
+            type: string
+          required: true
+          example: "www.google.com"
       responses:
         200:
-          description: "Operación de lectura exitosa"
+          description: "Succesful resolution"
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Alumno'
+                $ref: '#/components/schemas/Resolution'
+        404:
+          description: "Domain name not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /custom-domains:
+    get:
+      operationId: "api.doh.get_custom_domains"
+      summary: "Return domains in database"
+      description: "Returns all current domains in the database that matach the query"
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: "The text that should contain the domain"
+          example: "goog"
+      responses:
+        200:
+          description: "Domains"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  item:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Resolution'
     post:
-      operationId: "api.alumnos.crear"
-      tags:
-        - "Alumnos"
-      summary: "Alta de un alumno de la materia"
-      description: "Crea un nuevo alumno y lo agrega a la lista de alumnos de la materia"
+      operationId: "api.doh.post_custom_domain"
+      summary: ""
+      description: ""
       requestBody:
         required: true
-        x-body-name: 'alumno'
+        x-body-name: 'record'
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InputAlumno'
+              $ref: '#/components/schemas/Record'
       responses:
         201:
-          description: "Se creo el alumno correctamente"
+          description: "The record was created succesfully"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Alumno'
+                $ref: '#/components/schemas/Resolution'
         400:
-          description: "DNI o padron duplicado"
-  /alumnos/{id_alumno}:
-    get:
-      operationId: "api.alumnos.obtener_uno"
-      tags:
-        - "Alumnos"
-      summary: "Alumno de la materia"
-      description: "Obtiene un alumno particular de la materia"
+          description: "Custom domain already exists"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Record'
+  /custom-domains/{domain}:
+    put:
+      operationId: "api.doh.put_custom_domain"
+      summary: "Update a record in the database"
+      description: "Update the ip of a record in the database"
       parameters:
         - in: path
-          name: id_alumno
-          required: true
+          name: domain
           schema:
-            type: integer
-          description: El id del usuario a obtener
+            type: string
+          required: true
+          example: "www.google.com"
+      requestBody:
+        required: true
+        x-body-name: 'record'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Record'
       responses:
         200:
-          description: "Operación de lectura exitosa"
+          description: "Update succesful"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Alumno'
+                $ref: '#/components/schemas/Resolution'
         404:
-          description: "Alumno no encontrado"
+          description: "Domain not found or payload invalid"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
-      operationId: "api.alumnos.borrar"
-      tags:
-        - "Alumnos"
-      summary: "Borrar alumno de la materia"
-      description: "Borra un alumno de la materia"
+      operationId: "api.doh.delete_custom_domain"
+      summary: "Delete custom domain"
+      description: "Delete a custom domain from the database"
       parameters:
         - in: path
-          name: id_alumno
-          required: true
+          name: domain
           schema:
-            type: integer
-          description: El id del usuario a borrar
+            type: string
+          required: true
+          example: "www.google.com"
       responses:
-        204:
-          description: "Operación de lectura exitosa"
+        200:
+          description: "Deletion succesful"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainName'
         404:
-          description: "Alumno no encontrado"
+          description: "Domain not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 # Declaración de tipos de datos
 components:
   schemas:
-    Alumno:
+    Resolution:
       type: "object"
       properties:
-        id:
-          type: "number"
-        nombre:
+        domain:
           type: "string"
-        dni:
+          example: "www.google.com"
+        ip:
           type: "string"
-        padron:
-          type: "string"
-    InputAlumno:
-      type: "object"
-      properties:
-        nombre:
-          type: "string"
-        dni:
-          type: "string"
-        padron:
-          type: "string"
+          example: "1.1.1.1"
+        custom:
+          type: "boolean"
+          example: false
     Error:
       type: "object"
       properties:
-        codigo:
-          type: "number"
-        mensaje:
+        error:
           type: "string"
+    Record:
+      type: "object"
+      properties:
+        domain:
+          type: "string"
+          example: "www.google.com"
+        ip:
+          type: "string"
+          example: "1.1.1.1"
+    DomainName:
+      type: "object"
+      properties:
+        domain:
+          type: "string"
+          example: "www.google.com"
