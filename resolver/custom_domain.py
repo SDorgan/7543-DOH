@@ -5,6 +5,7 @@ class CustomDomain(Domain):
 
     def __init__(self, name):
         Domain.__init__(self, name, 0)
+        self.custom = True
 
     def add_associated_ip(self, ip):
         if self.associated_ips:
