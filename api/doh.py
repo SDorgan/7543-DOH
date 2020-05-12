@@ -5,6 +5,7 @@ from resolver.dns_query_service import DnsQueryService
 from resolver.get_domain_service import GetDomainService
 from resolver.get_custom_domains_service import GetCustomDomainService
 from resolver.push_domain_service import PushDomainService
+from resolver.put_domain_service import PutDomainService
 
 
 def get_domain(domain):
@@ -29,7 +30,6 @@ def get_custom_domains(q=''):
 
 
 def post_custom_domain(**kwargs):
-    
     body = kwargs.get('body')
     if ('domain' not in body) or ('ip' not in body):
         #Specified Error. Could be changed to malformed 
@@ -45,11 +45,22 @@ def post_custom_domain(**kwargs):
     return jsonify(resolution.serialize()), 201
 
 
-def put_custom_domain(domain, **kwargs):
-    print(domain)
+def put_custom_domain(domain = '', **kwargs):
     body = kwargs.get('body')
-    print(body)
-    pass
+    if ('domain' not in body) or ('ip' not in body):
+        error = Error('payload is invalid')
+        return jsonify(error.serialize()), 400
+    if (body['domain'] != domain): #TBD
+        error = Error('payload is invalid')
+        return jsonify(error.serialize()), 400
+    service = PutDomainService(body['domain'], body['ip'])
+    domain = service.modify_domain()
+    if (domain is None):
+        error = Error('domain not found')
+        return jsonify(error.serialize()), 404
+
+    resolution = service.get_response()
+    return jsonify(resolution.serialize()), 200
 
 
 def delete_custom_domain(domain):
