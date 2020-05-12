@@ -1,6 +1,7 @@
 from flask import abort, make_response, jsonify
 
 from api.doh_dtos import Error
+from resolver.delete_domain_service import DeleteCustomDomainService
 from resolver.dns_query_service import DnsQueryService
 from resolver.get_domain_service import GetDomainService
 from resolver.get_custom_domains_service import GetCustomDomainService
@@ -35,6 +36,7 @@ def post_custom_domain(**kwargs):
         #Specified Error. Could be changed to malformed 
         error = Error('custom domain already exists')
         return jsonify(error.serialize()), 404
+
     service = PushDomainService(body['domain'], body['ip'])
     domain = service.add_domain()
     if (domain is None):
@@ -50,9 +52,11 @@ def put_custom_domain(domain = '', **kwargs):
     if ('domain' not in body) or ('ip' not in body):
         error = Error('payload is invalid')
         return jsonify(error.serialize()), 400
+
     if (body['domain'] != domain): #TBD
         error = Error('payload is invalid')
         return jsonify(error.serialize()), 400
+
     service = PutDomainService(body['domain'], body['ip'])
     domain = service.modify_domain()
     if (domain is None):
@@ -63,7 +67,12 @@ def put_custom_domain(domain = '', **kwargs):
     return jsonify(resolution.serialize()), 200
 
 
-def delete_custom_domain(domain):
-    print(domain)
-    pass
+def delete_custom_domain(domain = ''):
+    service = DeleteCustomDomainService(domain)
+    deleted = service.delete_custom_domains()
+    if (deleted is None):
+        error = Error('domain not found')
+        return jsonify(error.serialize()), 404
+    
+    return {'domain': domain}, 200
 
