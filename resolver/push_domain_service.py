@@ -2,7 +2,7 @@ from resolver.database import Database
 from api.doh_dtos import Resolution
 from resolver.custom_domain import CustomDomain
 
-class CreationService:
+class PushDomainService:
     domain_name = None
     domain_ip = None
 
