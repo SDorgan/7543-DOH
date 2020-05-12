@@ -1,9 +1,19 @@
-from flask import abort, make_response
+from flask import abort, make_response, jsonify
+
 from resolver.creation_service import CreationService
+from api.doh_dtos import Error
+from resolver.dns_query_service import DnsQueryService
+from resolver.get_domain_service import GetDomainService
+
 
 def get_domain(domain):
-    print(domain)
-    pass
+    service = GetDomainService(domain, DnsQueryService(domain))
+    try:
+        resolution = service.get_domain_resolution()
+        return jsonify(resolution.serialize()), 201
+    except Exception:
+        error = Error('domain not found')
+        return jsonify(error.serialize()), 404
 
 
 def get_custom_domains(q=''):

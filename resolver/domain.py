@@ -8,12 +8,14 @@ class Domain:
     time_to_live = None
     associated_ips = None
     creation_time = None
+    custom = None
 
     def __init__(self, name, time_to_live):
         self.name = name
         self.time_to_live = time_to_live
         self.associated_ips = []
         self.creation_time = datetime.now()
+        self.custom = False
 
     def add_associated_ip(self, ip):
         self.associated_ips.append(ip)
