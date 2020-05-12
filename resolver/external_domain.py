@@ -31,3 +31,6 @@ class ExternalDomain(Domain):
     def is_valid(self):
         domain_minutes_with_life = (datetime.now() - self.creation_time).total_seconds() / self.SECONDS_IN_A_MINUTE
         return self.time_to_live > domain_minutes_with_life
+
+    def is_custom(self):
+        return False

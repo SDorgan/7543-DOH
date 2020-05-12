@@ -4,7 +4,7 @@ from datetime import datetime
 class Domain:
     name = None
     # time_to_live (minutes)
-    # time_to_live=0 means it never dies
+    # time_to_live=-1 means it never dies
     time_to_live = None
     associated_ips = None
     creation_time = None
@@ -25,4 +25,7 @@ class Domain:
         raise Exception('To Be Defined!')
 
     def is_valid(self):
+        raise Exception('To Be Defined!')
+
+    def is_custom(self):
         raise Exception('To Be Defined!')
