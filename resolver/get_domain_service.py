@@ -18,7 +18,7 @@ class GetDomainService:
         self.check_if_exists()
         self.validate_time_to_live()
         ip = self.domain.resolve()
-        return Resolution(self.domain_name, ip, self.domain.custom)
+        return Resolution(self.domain_name, ip, self.domain.is_custom())
 
     def get_domain_by_name(self):
         self.check_if_exists()

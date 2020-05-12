@@ -22,17 +22,20 @@ def get_custom_domains(q=''):
 
 
 def post_custom_domain(**kwargs):
+    
     body = kwargs.get('body')
     if ('domain' not in body) or ('ip' not in body):
         #Specified Error. Could be changed to malformed 
-        return abort(400, "custom domain already exists")
-
-    domain = CreationService.get_instance().add_domain(body['domain'], body['ip'])
+        error = Error('custom domain already exists')
+        return jsonify(error.serialize()), 404
+    service = CreationService(body['domain'], body['ip'])
+    domain = service.add_domain()
     if (domain is None):
-        return abort(400, "custom domain already exists")
+        error = Error('custom domain already exists')
+        return jsonify(error.serialize()), 404
 
-    response_body = {'domain': body['domain'], 'ip': body['ip'], 'custom': True}
-    return make_response(response_body , 201)
+    resolution = service.get_response()
+    return jsonify(resolution.serialize()), 201
 
 
 def put_custom_domain(domain, **kwargs):
