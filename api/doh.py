@@ -1,6 +1,6 @@
 from flask import abort, make_response, jsonify
 
-from resolver.creation_service import CreationService
+from resolver.push_domain_service import PushDomainService
 from api.doh_dtos import Error
 from resolver.dns_query_service import DnsQueryService
 from resolver.get_domain_service import GetDomainService
@@ -28,7 +28,7 @@ def post_custom_domain(**kwargs):
         #Specified Error. Could be changed to malformed 
         error = Error('custom domain already exists')
         return jsonify(error.serialize()), 404
-    service = CreationService(body['domain'], body['ip'])
+    service = PushDomainService(body['domain'], body['ip'])
     domain = service.add_domain()
     if (domain is None):
         error = Error('custom domain already exists')
