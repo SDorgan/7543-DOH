@@ -21,7 +21,6 @@ class PushDomainService:
     def __custom_domain_already_exists(self):
         domain = Database.get_instance().db['domains'].get(self.domain_name, None)
         if domain is not None and domain.is_custom():
-            print("entra al if")
             return True
         return False
 

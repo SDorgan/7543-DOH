@@ -1,9 +1,10 @@
 from flask import abort, make_response, jsonify
 
-from resolver.push_domain_service import PushDomainService
 from api.doh_dtos import Error
 from resolver.dns_query_service import DnsQueryService
 from resolver.get_domain_service import GetDomainService
+from resolver.get_custom_domains_service import GetCustomDomainService
+from resolver.push_domain_service import PushDomainService
 
 
 def get_domain(domain):
@@ -17,8 +18,14 @@ def get_domain(domain):
 
 
 def get_custom_domains(q=''):
-    print('[', q, ']', sep='')
-    pass
+    service = GetCustomDomainService(q)
+    service.get_custom_domains()
+
+    resolutions = service.get_response()
+    answer = {'items': []}
+    for element in resolutions:
+        answer['items'].append(element.serialize())
+    return answer, 200
 
 
 def post_custom_domain(**kwargs):
