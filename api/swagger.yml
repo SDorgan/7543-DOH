@@ -55,7 +55,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  item:
+                  items:
                     type: array
                     items:
                       $ref: '#/components/schemas/Resolution'
@@ -82,7 +82,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Record'
+                $ref: '#/components/schemas/Error'
   /custom-domains/{domain}:
     put:
       operationId: "api.doh.put_custom_domain"
@@ -109,6 +109,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Resolution'
+        400:
+          description: "Payload is invalid"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: "Domain not found or payload invalid"
           content:
